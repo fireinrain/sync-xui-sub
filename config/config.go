@@ -2,6 +2,7 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
+	"log"
 	"os"
 	"strings"
 	"sync-xui-sub/version"
@@ -66,13 +67,13 @@ func newConfig() *Settings {
 		//read yaml
 		yamlFile, err := os.ReadFile(ConfigFileName)
 		if err != nil {
-			panic(err)
+			log.Println(err)
 		}
 		// Unmarshal the YAML into a slice of Login structs
 		var settings Settings
 		err = yaml.Unmarshal(yamlFile, &settings)
 		if err != nil {
-			panic(err)
+			log.Println(err)
 		}
 		s = &settings
 		nodeStr := s.Servers.Nodes
