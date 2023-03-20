@@ -17,25 +17,26 @@ import (
 type NodeListResp struct {
 	Success bool   `json:"success"`
 	Msg     string `json:"msg"`
-	Obj     []struct {
-		ID             int    `json:"id"`
-		Up             int64  `json:"up"`
-		Down           int64  `json:"down"`
-		Total          int    `json:"total"`
-		Remark         string `json:"remark"`
-		Enable         bool   `json:"enable"`
-		ExpiryTime     int    `json:"expiryTime"`
-		Autoreset      bool   `json:"autoreset"`
-		Ipalert        bool   `json:"ipalert"`
-		Iplimit        int    `json:"iplimit"`
-		Listen         string `json:"listen"`
-		Port           int    `json:"port"`
-		Protocol       string `json:"protocol"`
-		Settings       string `json:"settings"`
-		StreamSettings string `json:"streamSettings"`
-		Tag            string `json:"tag"`
-		Sniffing       string `json:"sniffing"`
-	} `json:"obj"`
+	Obj     []Obj  `json:"obj"`
+}
+type Obj struct {
+	ID             int    `json:"id"`
+	Up             int64  `json:"up"`
+	Down           int64  `json:"down"`
+	Total          int    `json:"total"`
+	Remark         string `json:"remark"`
+	Enable         bool   `json:"enable"`
+	ExpiryTime     int    `json:"expiryTime"`
+	Autoreset      bool   `json:"autoreset"`
+	Ipalert        bool   `json:"ipalert"`
+	Iplimit        int    `json:"iplimit"`
+	Listen         string `json:"listen"`
+	Port           int    `json:"port"`
+	Protocol       string `json:"protocol"`
+	Settings       string `json:"settings"`
+	StreamSettings string `json:"streamSettings"`
+	Tag            string `json:"tag"`
+	Sniffing       string `json:"sniffing"`
 }
 
 // LoginForCookie
@@ -163,9 +164,29 @@ func GetAllServerNodeList(config *config.Settings) []NodeListResp {
 	return result
 }
 
-//func FilterEnabledNodes(protocol string,nodes []NodeListResp) []NodeListResp {
-//
-//}
+func FilterEnabledNodes(protocol string, ignoreFlag string, nodes []NodeListResp) []Obj {
+	var result []Obj
+
+	if len(nodes) <= 0 {
+		return result
+	}
+	for _, node := range nodes {
+		obj := node.Obj
+		for _, o := range obj {
+			if o.Protocol == protocol {
+				result = append(result, o)
+			}
+		}
+	}
+	//过滤出enable的 ignoreFlag
+	var finalResult []Obj
+	for _, obj := range result {
+		if obj.Enable == true && !strings.Contains(obj.Remark, ignoreFlag) {
+			finalResult = append(finalResult, obj)
+		}
+	}
+	return finalResult
+}
 
 // GetBaseUrlFromUrl
 //

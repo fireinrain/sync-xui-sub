@@ -17,6 +17,8 @@ func main() {
 	list := xui.GetAllServerNodeList(globalConfig)
 
 	fmt.Println(list)
+	nodes := xui.FilterEnabledNodes(globalConfig.NodeProtocol, globalConfig.Servers.IgnoreNodeFlag, list)
+	fmt.Println(nodes)
 
 	//let obj = {
 	//            v: '2',
