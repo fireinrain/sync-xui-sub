@@ -29,6 +29,8 @@ func TestLoginAllNodeCookies(t *testing.T) {
 
 func TestGetServerNodeList(t *testing.T) {
 	globalConfig := config.GlobalConfig
+	globalConfig = LoginAllNodeCookies(globalConfig)
+
 	url := globalConfig.Servers.NodeDetail[0].BaseUrl
 	cookie := globalConfig.Servers.NodeDetail[0].Cookie
 
@@ -37,5 +39,11 @@ func TestGetServerNodeList(t *testing.T) {
 		fmt.Println(err)
 	}
 	fmt.Printf("%v\n", list)
+
+}
+
+func TestGetBaseUrlFromUrl(t *testing.T) {
+	url := GetBaseUrlFromUrl("https://xui.131433.xyz/admin/xui/inbounds")
+	fmt.Println(url)
 
 }

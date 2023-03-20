@@ -3,6 +3,7 @@ package xui
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -85,7 +86,7 @@ func LoginForCookie(loginUrl string, username, password string) string {
 	cookie := cookies[0]
 	value := cookie.Value
 	log.Println(string(body))
-	return value
+	return "session=" + value
 }
 
 // LoginAllNodeCookies
@@ -124,21 +125,64 @@ func GetServerNodeList(baseUrl string, cookie string) (*NodeListResp, error) {
 		return nil, err2
 	}
 	req2.Header.Set("Cookie", cookie)
+	req2.Header.Set("origin", GetBaseUrlFromUrl(listUrl))
+	req2.Header.Set("referrer", strings.ReplaceAll(listUrl, "/list", ""))
 	resp2, err := client.Do(req2)
 	if err != nil {
 		return nil, err
 	}
 	defer resp2.Body.Close()
-	//json
-	var response NodeListResp
-	err = json.NewDecoder(resp2.Body).Decode(&response)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+	jsonResp, err2 := io.ReadAll(resp2.Body)
+	if err2 != nil {
+		panic(err2)
 	}
+	//json
+	var response = NodeListResp{}
+	err2 = json.Unmarshal(jsonResp, &response)
+
+	//err = json.NewDecoder(resp2.Body).Decode(&response)
+	//if err != nil {
+	//	log.Println(err)
+	//	return nil, err
+	//}
+	fmt.Println(string(jsonResp))
 	return &response, nil
+}
+
+func GetAllServerNodeList(config *config.Settings) []NodeListResp {
+	nodeDetails := config.Servers.NodeDetail
+	var result []NodeListResp
+	for _, detail := range nodeDetails {
+		list, err := GetServerNodeList(detail.BaseUrl, detail.Cookie)
+		if err == nil {
+			result = append(result, *list)
+		} else {
+			log.Println("获取节点信息失败: ", err)
+		}
+	}
+	return result
 }
 
 //func FilterEnabledNodes(protocol string,nodes []NodeListResp) []NodeListResp {
 //
 //}
+
+// GetBaseUrlFromUrl
+//
+//	@Description: 获取baseUrl
+//	@param url
+//	@return string
+func GetBaseUrlFromUrl(urlStr string) string {
+	urlString := urlStr
+	parsedUrl, err := url.Parse(urlString)
+	if err != nil {
+		fmt.Println("Error parsing URL:", err)
+		return ""
+	}
+	baseUrl := &url.URL{
+		Scheme: parsedUrl.Scheme,
+		Host:   parsedUrl.Host,
+	}
+	//fmt.Println("Base URL:", baseUrl.String())
+	return baseUrl.String()
+}

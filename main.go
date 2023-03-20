@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sync-xui-sub/config"
 	"sync-xui-sub/xui"
 )
@@ -12,6 +13,10 @@ func main() {
 
 	config := xui.LoginAllNodeCookies(globalConfig)
 	globalConfig = config
+
+	list := xui.GetAllServerNodeList(globalConfig)
+
+	fmt.Println(list)
 
 	//let obj = {
 	//            v: '2',
