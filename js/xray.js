@@ -879,7 +879,6 @@ class Inbound extends XrayCommonClass {
         this.sniffing = new Sniffing();
     }
 
-    //TODO
     genVmessLink(address='', remark='') {
         if (this.protocol !== Protocols.VMESS) {
             return '';
