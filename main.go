@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
+	"sync-xui-sub/config"
 )
 
 func main() {
@@ -17,14 +17,15 @@ func main() {
 		panic(err)
 	}
 	// Define the form data
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-	baseUrl := os.Getenv("BASE_URL")
+	globalConfig := config.GlobalConfig
+	username := globalConfig.Servers.NodeDetail[0].Username
+	password := globalConfig.Servers.NodeDetail[0].Password
+	loginUrl := globalConfig.Servers.NodeDetail[0].LoginUrl
+	baseUrl := globalConfig.Servers.NodeDetail[0].BaseUrl
 	formData := url.Values{}
 	formData.Set("username", username)
 	formData.Set("password", password)
 
-	loginUrl := baseUrl + "/login"
 	// Create a new request with a POST method
 	req, err := http.NewRequest("POST", loginUrl, bytes.NewBufferString(formData.Encode()))
 	if err != nil {

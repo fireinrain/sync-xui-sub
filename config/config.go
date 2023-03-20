@@ -22,8 +22,10 @@ type Settings struct {
 }
 type Node struct {
 	LoginUrl string `yaml:"loginUrl"`
+	BaseUrl  string `yaml:"baseUrl"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	Cookie   string `yaml:"cookie"`
 }
 
 func init() {
@@ -52,6 +54,7 @@ func newConfig() *Settings {
 			password := nodeList[2]
 			n := Node{
 				LoginUrl: loginUrl,
+				BaseUrl:  strings.ReplaceAll(loginUrl, "/login", ""),
 				Username: userName,
 				Password: password,
 			}
@@ -78,6 +81,7 @@ func newConfig() *Settings {
 			split := strings.Split(node, ",")
 			n := Node{
 				LoginUrl: split[0],
+				BaseUrl:  strings.ReplaceAll(split[0], "/login", ""),
 				Username: split[1],
 				Password: split[2],
 			}

@@ -3,6 +3,7 @@ appName: "sync-xui-sub"
 version: "v1.0.0"
 servers:
   nodes:
+    # replace with your own loginUrl username and password
     - loginUrl,username,password
     - loginUrl,username,password
     - loginUrl,username,password
