@@ -207,3 +207,27 @@ func GetBaseUrlFromUrl(urlStr string) string {
 	//fmt.Println("Base URL:", baseUrl.String())
 	return baseUrl.String()
 }
+
+// GenVmessLinkFromObj
+//
+//	@Description: 生成vmess 分享链接
+//	@param obj
+//	@return string
+func GenVmessLinkFromObj(obj Obj) string {
+
+	return ""
+}
+
+// GenVmessLinkFromObjs
+//
+//	@Description:
+//	@param objs
+//	@return string
+func GenVmessLinkFromObjs(objs []Obj) string {
+	var result []string
+	for _, obj := range objs {
+		linkFromObj := GenVmessLinkFromObj(obj)
+		result = append(result, linkFromObj)
+	}
+	return strings.Join(result, "|")
+}

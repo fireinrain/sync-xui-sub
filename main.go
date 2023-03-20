@@ -19,6 +19,19 @@ func main() {
 	fmt.Println(list)
 	nodes := xui.FilterEnabledNodes(globalConfig.NodeProtocol, globalConfig.Servers.IgnoreNodeFlag, list)
 	fmt.Println(nodes)
+	linksStr := ""
+	switch globalConfig.NodeProtocol {
+	case "vmess":
+		objs := xui.GenVmessLinkFromObjs(nodes)
+		linksStr = objs
+	case "vless":
+		fmt.Println("processing vless nodes")
+	case "trojan":
+		fmt.Println("processing trojan nodes")
+	default:
+		fmt.Println("processing default")
+	}
+	fmt.Println(linksStr)
 
 	//let obj = {
 	//            v: '2',
