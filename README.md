@@ -11,6 +11,11 @@ sync-xui-sub is a tool for sync node setting to subconverter for clash or v2rayN
 # 方案
 配置各个面板的登录地址账号密码，然后获取节点，解析出节点信息，最后替换subconverter的profile 并重启subconverter
 
+# 使用
+```bash
+准备条件: 安装x-ui的vps 若干, 部署的机器上安装了subconverter
+
+```
 
 # TODO
 - [x] 完成基本功能
