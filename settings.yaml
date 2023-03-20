@@ -12,8 +12,8 @@ servers:
   ignoreNodeFlag: v2rayN
   nodes:
     # replace with your own loginUrl username and password
-    - loginUrl,username,password
-    - loginUrl,username,password
-    - loginUrl,username,password
+    - loginUrl1,username1,password1
+    - loginUrl2,username2,password2
+    - loginUrl3,username3,password3
 nodeProtocol: vmess
 
