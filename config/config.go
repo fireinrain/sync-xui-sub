@@ -13,11 +13,14 @@ var GlobalConfig *Settings
 const ConfigFileName = "settings.yaml"
 
 type Settings struct {
-	AppName string `yaml:"appName"`
-	Version string `yaml:"version"`
-	Servers struct {
-		Nodes      []string `yaml:"nodes"`
-		NodeDetail []Node   `yaml:"nodeDetail"`
+	AppName        string `yaml:"appName"`
+	Version        string `yaml:"version"`
+	SubRestartMode string `yaml:"subRestartMode"`
+	SubProfilePath string `yaml:"subProfilePath"`
+	Servers        struct {
+		IgnoreNodeFlag string   `yaml:"ignoreNodeFlag"`
+		Nodes          []string `yaml:"nodes"`
+		NodeDetail     []Node   `yaml:"nodeDetail"`
 	} `yaml:"servers"`
 	NodeProtocol string `yaml:"nodeProtocol"`
 }
@@ -35,11 +38,14 @@ func init() {
 
 func newConfig() *Settings {
 	s := &Settings{
-		AppName: version.AppName,
-		Version: version.Version,
+		AppName:        version.AppName,
+		Version:        version.AppName,
+		SubRestartMode: "",
+		SubProfilePath: "",
 		Servers: struct {
-			Nodes      []string `yaml:"nodes"`
-			NodeDetail []Node   `yaml:"nodeDetail"`
+			IgnoreNodeFlag string   `yaml:"ignoreNodeFlag"`
+			Nodes          []string `yaml:"nodes"`
+			NodeDetail     []Node   `yaml:"nodeDetail"`
 		}{},
 		NodeProtocol: "",
 	}
@@ -97,6 +103,26 @@ func newConfig() *Settings {
 		s.NodeProtocol = protocol
 	} else {
 		s.NodeProtocol = "vmess"
+	}
+
+	mode := os.Getenv("SubRestartMode")
+	if mode != "" {
+		s.SubRestartMode = mode
+	} else {
+		s.SubRestartMode = "systemctl"
+	}
+
+	profilePath := os.Getenv("SubProfilePath")
+	if profilePath != "" {
+		s.SubProfilePath = profilePath
+	} else {
+		s.SubProfilePath = "/root/docker-compose/subconverter/pref.ini"
+	}
+	ignoreFlag := os.Getenv("IgnoreNodeFlag")
+	if ignoreFlag != "" {
+		s.Servers.IgnoreNodeFlag = ignoreFlag
+	} else {
+		s.Servers.IgnoreNodeFlag = "v2rayN"
 	}
 	return s
 }

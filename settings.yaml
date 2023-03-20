@@ -1,7 +1,15 @@
 
 appName: "sync-xui-sub"
 version: "v1.0.0"
+# binary use systemctl restart subconverter
+# docker use docker restart
+# systemctl or docker
+subRestartMode: docker
+# Profile path to subconverter profile
+subProfilePath: /root/docker-compose/subconverter/pref.ini
 servers:
+  # ignore node if node remark contains v2rayN
+  ignoreNodeFlag: v2rayN
   nodes:
     # replace with your own loginUrl username and password
     - loginUrl,username,password
