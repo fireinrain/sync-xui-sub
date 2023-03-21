@@ -1,7 +1,11 @@
 package js
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
 	v8 "rogchap.com/v8go"
+	"strings"
 )
 
 type ServerNode struct {
@@ -26,13 +30,29 @@ type ServerNode struct {
 
 //在golang中执行js
 
-var V8COntext *v8.Context
+var V8Context *v8.Context
 
 func init() {
-	V8COntext = v8.NewContext() // new context with a default VM
+	V8Context = v8.NewContext() // new context with a default VM
 }
 
-func (receiver ServerNode) GenLink() string {
+func (receiver ServerNode) GenLink() (string, error) {
+	nodeData, err := json.Marshal(receiver)
+	if err != nil {
+		log.Println("json.Marshal failed: ", err)
+		return "", err
+	}
+	nodeDataStr := strings.ReplaceAll(string(nodeData), "\\n", "")
 
-	return ""
+	//parse, err := v8.JSONParse(V8Context, nodeDataStr)
+	//fmt.Println(parse)
+	//将nodeData转换为js object
+	jsonToObj := fmt.Sprintf("const nodeData = JSON.parse('%s')", nodeDataStr)
+	script, err := V8Context.RunScript(jsonToObj, "jsonToObj.js")
+	fmt.Println(script)
+	//V8Context.RunScript("const result = add(3, 4)", "main.js")
+	val, err := V8Context.RunScript("nodeData", "jsonToObj.js")
+	fmt.Printf("addition result: %s", val)
+	fmt.Printf(err.Error())
+	return "", nil
 }
