@@ -1,6 +1,8 @@
 package js
 
-import v8 "rogchap.com/v8go"
+import (
+	v8 "rogchap.com/v8go"
+)
 
 type ServerNode struct {
 	ID             int    `json:"id"`
@@ -24,13 +26,13 @@ type ServerNode struct {
 
 //在golang中执行js
 
-func init() {
-	iso := v8.NewIsolate()     // creates a new JavaScript VM
-	ctx1 := v8.NewContext(iso) // new context within the VM
-	ctx1.RunScript("const multiply = (a, b) => a * b", "math.js")
+var V8COntext *v8.Context
 
-	ctx2 := v8.NewContext(iso) // another context on the same VM
-	if _, err := ctx2.RunScript("multiply(3, 4)", "main.js"); err != nil {
-		// this will error as multiply is not defined in this context
-	}
+func init() {
+	V8COntext = v8.NewContext() // new context with a default VM
+}
+
+func (receiver ServerNode) GenLink() string {
+
+	return ""
 }
