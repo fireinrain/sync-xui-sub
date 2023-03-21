@@ -1,5 +1,5 @@
-# sync-xui-sub
-sync-xui-sub is a tool for sync node setting to subconverter for clash or v2rayN subscribe
+# xui-sub-sync
+xui-sub-sync is a tool for sync node setting to subconverter for clash or v2rayN subscribe
 
 # 需求
 我平时有好几台vps安装了x-ui(xray内核),我使用subconverter来配置这些节点的订阅，但是随着x-ui运行时间的加长

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync-xui-sub/version"
+	"xui-sub-sync/version"
 )
 
 var GlobalConfig *Settings

@@ -3,8 +3,8 @@ package xui
 import (
 	"fmt"
 	"log"
-	"sync-xui-sub/config"
 	"testing"
+	"xui-sub-sync/config"
 )
 
 func TestLoginForCookie(t *testing.T) {

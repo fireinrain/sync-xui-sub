@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"sync-xui-sub/config"
-	"sync-xui-sub/xui"
+	"xui-sub-sync/config"
+	"xui-sub-sync/xui"
 )
 
 func main() {

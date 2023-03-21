@@ -1,5 +1,5 @@
 
-appName: "sync-xui-sub"
+appName: "xui-sub-sync"
 version: "v1.0.0"
 servers:
   nodes:

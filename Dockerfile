@@ -1,6 +1,6 @@
 FROM golang:1.19-alpine as builder
 
-RUN apk --no-cache add git && export GOPRIVATE=github.com/fireinrain/sync-xui-sub && \
+RUN apk --no-cache add git && export GOPRIVATE=github.com/fireinrain/xui-sub-sync && \
     export GOPROXY=https://goproxy.cn,direct
 
 COPY . /root/build

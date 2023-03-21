@@ -10,9 +10,9 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"strings"
-	"sync-xui-sub/config"
-	"sync-xui-sub/js"
 	"time"
+	"xui-sub-sync/config"
+	"xui-sub-sync/js"
 )
 
 type NodeListResp struct {

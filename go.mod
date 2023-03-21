@@ -1,4 +1,4 @@
-module sync-xui-sub
+module xui-sub-sync
 
 go 1.19
 
