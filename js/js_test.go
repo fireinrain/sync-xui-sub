@@ -61,3 +61,43 @@ func TestV8Go2(t *testing.T) {
 	reflect.DeepEqual(val, "3")
 
 }
+
+func TestGetLinkFromJsonStr(t *testing.T) {
+	node := ServerNode{
+		ID:             5,
+		Up:             619517876,
+		Down:           619517876,
+		Total:          53687091200,
+		Remark:         "speedtest",
+		Enable:         false,
+		ExpiryTime:     0,
+		Autoreset:      false,
+		Ipalert:        false,
+		Iplimit:        0,
+		Listen:         "",
+		Port:           59876,
+		Protocol:       "vmess",
+		Settings:       "{\n  \"clients\": [\n    {\n      \"id\": \"14d6853c-813c-49ff-8d09-7edbe832af44\",\n      \"alterId\": 0\n    }\n  ],\n  \"disableInsecureEncryption\": false\n}",
+		StreamSettings: "{\n  \"network\": \"ws\",\n  \"security\": \"tls\",\n  \"tlsSettings\": {\n    \"serverName\": \"cloud2.131433.xyz\",\n    \"certificates\": [\n      {\n        \"certificateFile\": \"/nginxweb/cert/fullchain.cer\",\n        \"keyFile\": \"/nginxweb/cert/private.key\"\n      }\n    ]\n  },\n  \"wsSettings\": {\n    \"path\": \"/fire\",\n    \"headers\": {}\n  }\n}",
+		Tag:            "inbound-59876",
+		Sniffing:       "{\n  \"enabled\": true,\n  \"destOverride\": [\n    \"http\",\n    \"tls\"\n  ]\n}",
+	}
+	standard := FormatJsonStrForStandard(node)
+
+	ctx := v8.NewContext()
+	file, err := os.ReadFile("core.js")
+	if err != nil {
+		panic(err)
+	}
+	coreJs := string(file)
+	ctx.RunScript(coreJs, "corelink.js")
+	sprintf := fmt.Sprintf("const jsonStr = %s", standard)
+	ctx.RunScript(sprintf, "variable.js")
+	_, err2 := ctx.RunScript("const temp = JSON.stringify(jsonStr); const result = getLinkFromJsonStr(temp);", "run.js")
+	if err2 != nil {
+		fmt.Println(err2.Error())
+	}
+
+	val, _ := ctx.RunScript("result", "result.js") // global object will have the property set within the JS VM
+	fmt.Printf("result: %s", val)
+}

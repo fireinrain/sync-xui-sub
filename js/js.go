@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	v8 "rogchap.com/v8go"
-	"strings"
 )
 
 type ServerNode struct {
@@ -37,22 +37,75 @@ func init() {
 }
 
 func (receiver ServerNode) GenLink() (string, error) {
-	nodeData, err := json.Marshal(receiver)
+	standard := FormatJsonStrForStandard(receiver)
+
+	ctx := v8.NewContext()
+	file, err := os.ReadFile("core.js")
 	if err != nil {
-		log.Println("json.Marshal failed: ", err)
+		fmt.Println("read core.js error:", err)
 		return "", err
 	}
-	nodeDataStr := strings.ReplaceAll(string(nodeData), "\\n", "")
+	coreJs := string(file)
+	ctx.RunScript(coreJs, "corelink.js")
+	sprintf := fmt.Sprintf("const jsonStr = %s", standard)
+	ctx.RunScript(sprintf, "variable.js")
+	_, err2 := ctx.RunScript("const temp = JSON.stringify(jsonStr); const result = getLinkFromJsonStr(temp);", "run.js")
+	if err2 != nil {
+		fmt.Println("v8 run js error: ", err2.Error())
+		return "", err2
+	}
+	val, _ := ctx.RunScript("result", "result.js") // global object will have the property set within the JS VM
+	//fmt.Printf("result: %s", val)
+	return val.String(), nil
+}
 
-	//parse, err := v8.JSONParse(V8Context, nodeDataStr)
-	//fmt.Println(parse)
-	//将nodeData转换为js object
-	jsonToObj := fmt.Sprintf("const nodeData = JSON.parse('%s')", nodeDataStr)
-	script, err := V8Context.RunScript(jsonToObj, "jsonToObj.js")
-	fmt.Println(script)
-	//V8Context.RunScript("const result = add(3, 4)", "main.js")
-	val, err := V8Context.RunScript("nodeData", "jsonToObj.js")
-	fmt.Printf("addition result: %s", val)
-	fmt.Printf(err.Error())
-	return "", nil
+func FormatJsonStrForStandard(node ServerNode) string {
+	nodeData, err := json.Marshal(node)
+	if err != nil {
+		log.Println("json.Marshal failed: ", err)
+		return ""
+	}
+	//nodeDataStr := strings.ReplaceAll(string(nodeData), "\\n", "")
+
+	//var data map[string]interface{}
+	//err = json.Unmarshal([]byte(nodeDataStr), &data)
+	//if err != nil {
+	//	log.Println("json.UnMarshal failed: ", err)
+	//	return ""
+	//}
+	//
+	//// convert settings and sniffing fields to JSON objects
+	//settingsStr := data["settings"].(string)
+	//var settingsObj map[string]interface{}
+	//err = json.Unmarshal([]byte(settingsStr), &settingsObj)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//data["settings"] = settingsObj
+	//
+	//streamSettingsStr := data["streamSettings"].(string)
+	//var streamSettingsObj map[string]interface{}
+	//err = json.Unmarshal([]byte(streamSettingsStr), &settingsObj)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//data["streamSettings"] = streamSettingsObj
+	//
+	//sniffingStr := data["sniffing"].(string)
+	//var sniffingObj map[string]interface{}
+	//err = json.Unmarshal([]byte(sniffingStr), &sniffingObj)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//data["sniffing"] = sniffingObj
+	//
+	//// marshal data to standard JSON format
+	//jsonData, err := json.MarshalIndent(data, "", "  ")
+	//if err != nil {
+	//	panic(err)
+	//}
+	// print standard JSON string
+	//return string(jsonData)
+	//return nodeDataStr
+	return string(nodeData)
 }

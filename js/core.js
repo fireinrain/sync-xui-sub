@@ -1625,7 +1625,9 @@ class DBInbound {
   }
 
   get address() {
-    let address = location.hostname;
+    // let address = location.hostname;
+    // Fix in nodejs not location object
+    let address = "0.0.0.0"
     if (!ObjectUtil.isEmpty(this.listen) && this.listen !== "0.0.0.0") {
       address = this.listen;
     }
@@ -1722,7 +1724,292 @@ class AllSetting {
 
 /////////////////////////////models.js end //////////////////////////////////
 
-const getLinkForme = function (data){
+
+
+
+class ObjectUtil {
+
+  static getPropIgnoreCase(obj, prop) {
+    for (const name in obj) {
+      if (!obj.hasOwnProperty(name)) {
+        continue;
+      }
+      if (name.toLowerCase() === prop.toLowerCase()) {
+        return obj[name];
+      }
+    }
+    return undefined;
+  }
+
+  static deepSearch(obj, key) {
+    if (obj instanceof Array) {
+      for (let i = 0; i < obj.length; ++i) {
+        if (this.deepSearch(obj[i], key)) {
+          return true;
+        }
+      }
+    } else if (obj instanceof Object) {
+      for (let name in obj) {
+        if (!obj.hasOwnProperty(name)) {
+          continue;
+        }
+        if (this.deepSearch(obj[name], key)) {
+          return true;
+        }
+      }
+    } else {
+      return obj.toString().indexOf(key) >= 0;
+    }
+    return false;
+  }
+
+  static isEmpty(obj) {
+    return obj === null || obj === undefined || obj === '';
+  }
+
+  static isArrEmpty(arr) {
+    return !this.isEmpty(arr) && arr.length === 0;
+  }
+
+  static copyArr(dest, src) {
+    dest.splice(0);
+    for (const item of src) {
+      dest.push(item);
+    }
+  }
+
+  static clone(obj) {
+    let newObj;
+    if (obj instanceof Array) {
+      newObj = [];
+      this.copyArr(newObj, obj);
+    } else if (obj instanceof Object) {
+      newObj = {};
+      for (const key of Object.keys(obj)) {
+        newObj[key] = obj[key];
+      }
+    } else {
+      newObj = obj;
+    }
+    return newObj;
+  }
+
+  static deepClone(obj) {
+    let newObj;
+    if (obj instanceof Array) {
+      newObj = [];
+      for (const item of obj) {
+        newObj.push(this.deepClone(item));
+      }
+    } else if (obj instanceof Object) {
+      newObj = {};
+      for (const key of Object.keys(obj)) {
+        newObj[key] = this.deepClone(obj[key]);
+      }
+    } else {
+      newObj = obj;
+    }
+    return newObj;
+  }
+
+  static cloneProps(dest, src, ...ignoreProps) {
+    if (dest == null || src == null) {
+      return;
+    }
+    const ignoreEmpty = this.isArrEmpty(ignoreProps);
+    for (const key of Object.keys(src)) {
+      if (!src.hasOwnProperty(key)) {
+        continue;
+      } else if (!dest.hasOwnProperty(key)) {
+        continue;
+      } else if (src[key] === undefined) {
+        continue;
+      }
+      if (ignoreEmpty) {
+        dest[key] = src[key];
+      } else {
+        let ignore = false;
+        for (let i = 0; i < ignoreProps.length; ++i) {
+          if (key === ignoreProps[i]) {
+            ignore = true;
+            break;
+          }
+        }
+        if (!ignore) {
+          dest[key] = src[key];
+        }
+      }
+    }
+  }
+
+  static delProps(obj, ...props) {
+    for (const prop of props) {
+      if (prop in obj) {
+        delete obj[prop];
+      }
+    }
+  }
+
+  static execute(func, ...args) {
+    if (!this.isEmpty(func) && typeof func === 'function') {
+      func(...args);
+    }
+  }
+
+  static orDefault(obj, defaultValue) {
+    if (obj == null) {
+      return defaultValue;
+    }
+    return obj;
+  }
+
+  static equals(a, b) {
+    for (const key in a) {
+      if (!a.hasOwnProperty(key)) {
+        continue;
+      }
+      if (!b.hasOwnProperty(key)) {
+        return false;
+      } else if (a[key] !== b[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+}
+////////////////////////////// ObjectUtil js end ////////////////////////
+
+const seq = [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g',
+  'h', 'i', 'j', 'k', 'l', 'm', 'n',
+  'o', 'p', 'q', 'r', 's', 't',
+  'u', 'v', 'w', 'x', 'y', 'z',
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  'A', 'B', 'C', 'D', 'E', 'F', 'G',
+  'H', 'I', 'J', 'K', 'L', 'M', 'N',
+  'O', 'P', 'Q', 'R', 'S', 'T',
+  'U', 'V', 'W', 'X', 'Y', 'Z'
+];
+
+class RandomUtil {
+
+  static randomIntRange(min, max) {
+    return parseInt(Math.random() * (max - min) + min, 10);
+  }
+
+  static randomInt(n) {
+    return this.randomIntRange(0, n);
+  }
+
+  static randomSeq(count) {
+    let str = '';
+    for (let i = 0; i < count; ++i) {
+      str += seq[this.randomInt(62)];
+    }
+    return str;
+  }
+
+  static randomLowerAndNum(count) {
+    let str = '';
+    for (let i = 0; i < count; ++i) {
+      str += seq[this.randomInt(36)];
+    }
+    return str;
+  }
+
+  static randomMTSecret() {
+    let str = '';
+    for (let i = 0; i < 32; ++i) {
+      let index = this.randomInt(16);
+      if (index <= 9) {
+        str += index;
+      } else {
+        str += seq[index - 10];
+      }
+    }
+    return str;
+  }
+
+  static randomUUID() {
+    let d = new Date().getTime();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      let r = (d + Math.random() * 16) % 16 | 0;
+      d = Math.floor(d / 16);
+      return (c === 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+    });
+  }
+}
+
+/////////////////////RandomUtils js end //////////////////////////
+
+const ONE_KB = 1024;
+const ONE_MB = ONE_KB * 1024;
+const ONE_GB = ONE_MB * 1024;
+const ONE_TB = ONE_GB * 1024;
+const ONE_PB = ONE_TB * 1024;
+
+function sizeFormat(size) {
+  if (size < ONE_KB) {
+    return size.toFixed(0) + " B";
+  } else if (size < ONE_MB) {
+    return (size / ONE_KB).toFixed(2) + " KB";
+  } else if (size < ONE_GB) {
+    return (size / ONE_MB).toFixed(2) + " MB";
+  } else if (size < ONE_TB) {
+    return (size / ONE_GB).toFixed(2) + " GB";
+  } else if (size < ONE_PB) {
+    return (size / ONE_TB).toFixed(2) + " TB";
+  } else {
+    return (size / ONE_PB).toFixed(2) + " PB";
+  }
+}
+
+function base64(str) {
+  return Base64.encode(str);
+}
+
+function safeBase64(str) {
+  return base64(str)
+    .replace(/\+/g, '-')
+    .replace(/=/g, '')
+    .replace(/\//g, '_');
+}
+
+function formatSecond(second) {
+  if (second < 60) {
+    return second.toFixed(0) + ' 秒';
+  } else if (second < 3600) {
+    return (second / 60).toFixed(0) + ' 分钟';
+  } else if (second < 3600 * 24) {
+    return (second / 3600).toFixed(0) + ' 小时';
+  } else {
+    return (second / 3600 / 24).toFixed(0) + ' 天';
+  }
+}
+
+function addZero(num) {
+  if (num < 10) {
+    return "0" + num;
+  } else {
+    return num;
+  }
+}
+
+function toFixed(num, n) {
+  n = Math.pow(10, n);
+  return Math.round(num * n) / n;
+}
+
+/////////////////////////common.js end /////////////////////////////////
+
+(function(global,factory){typeof exports==="object"&&typeof module!=="undefined"?module.exports=factory(global):typeof define==="function"&&define.amd?define(factory):factory(global)})(typeof self!=="undefined"?self:typeof window!=="undefined"?window:typeof global!=="undefined"?global:this,function(global){"use strict";var _Base64=global.Base64;var version="2.5.0";var buffer;if(typeof module!=="undefined"&&module.exports){try{buffer=eval("require('buffer').Buffer")}catch(err){buffer=undefined}}var b64chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";var b64tab=function(bin){var t={};for(var i=0,l=bin.length;i<l;i++)t[bin.charAt(i)]=i;return t}(b64chars);var fromCharCode=String.fromCharCode;var cb_utob=function(c){if(c.length<2){var cc=c.charCodeAt(0);return cc<128?c:cc<2048?fromCharCode(192|cc>>>6)+fromCharCode(128|cc&63):fromCharCode(224|cc>>>12&15)+fromCharCode(128|cc>>>6&63)+fromCharCode(128|cc&63)}else{var cc=65536+(c.charCodeAt(0)-55296)*1024+(c.charCodeAt(1)-56320);return fromCharCode(240|cc>>>18&7)+fromCharCode(128|cc>>>12&63)+fromCharCode(128|cc>>>6&63)+fromCharCode(128|cc&63)}};var re_utob=/[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g;var utob=function(u){return u.replace(re_utob,cb_utob)};var cb_encode=function(ccc){var padlen=[0,2,1][ccc.length%3],ord=ccc.charCodeAt(0)<<16|(ccc.length>1?ccc.charCodeAt(1):0)<<8|(ccc.length>2?ccc.charCodeAt(2):0),chars=[b64chars.charAt(ord>>>18),b64chars.charAt(ord>>>12&63),padlen>=2?"=":b64chars.charAt(ord>>>6&63),padlen>=1?"=":b64chars.charAt(ord&63)];return chars.join("")};var btoa=global.btoa?function(b){return global.btoa(b)}:function(b){return b.replace(/[\s\S]{1,3}/g,cb_encode)};var _encode=buffer?buffer.from&&Uint8Array&&buffer.from!==Uint8Array.from?function(u){return(u.constructor===buffer.constructor?u:buffer.from(u)).toString("base64")}:function(u){return(u.constructor===buffer.constructor?u:new buffer(u)).toString("base64")}:function(u){return btoa(utob(u))};var encode=function(u,urisafe){return!urisafe?_encode(String(u)):_encode(String(u)).replace(/[+\/]/g,function(m0){return m0=="+"?"-":"_"}).replace(/=/g,"")};var encodeURI=function(u){return encode(u,true)};var re_btou=new RegExp(["[À-ß][-¿]","[à-ï][-¿]{2}","[ð-÷][-¿]{3}"].join("|"),"g");var cb_btou=function(cccc){switch(cccc.length){case 4:var cp=(7&cccc.charCodeAt(0))<<18|(63&cccc.charCodeAt(1))<<12|(63&cccc.charCodeAt(2))<<6|63&cccc.charCodeAt(3),offset=cp-65536;return fromCharCode((offset>>>10)+55296)+fromCharCode((offset&1023)+56320);case 3:return fromCharCode((15&cccc.charCodeAt(0))<<12|(63&cccc.charCodeAt(1))<<6|63&cccc.charCodeAt(2));default:return fromCharCode((31&cccc.charCodeAt(0))<<6|63&cccc.charCodeAt(1))}};var btou=function(b){return b.replace(re_btou,cb_btou)};var cb_decode=function(cccc){var len=cccc.length,padlen=len%4,n=(len>0?b64tab[cccc.charAt(0)]<<18:0)|(len>1?b64tab[cccc.charAt(1)]<<12:0)|(len>2?b64tab[cccc.charAt(2)]<<6:0)|(len>3?b64tab[cccc.charAt(3)]:0),chars=[fromCharCode(n>>>16),fromCharCode(n>>>8&255),fromCharCode(n&255)];chars.length-=[0,0,2,1][padlen];return chars.join("")};var _atob=global.atob?function(a){return global.atob(a)}:function(a){return a.replace(/\S{1,4}/g,cb_decode)};var atob=function(a){return _atob(String(a).replace(/[^A-Za-z0-9\+\/]/g,""))};var _decode=buffer?buffer.from&&Uint8Array&&buffer.from!==Uint8Array.from?function(a){return(a.constructor===buffer.constructor?a:buffer.from(a,"base64")).toString()}:function(a){return(a.constructor===buffer.constructor?a:new buffer(a,"base64")).toString()}:function(a){return btou(_atob(a))};var decode=function(a){return _decode(String(a).replace(/[-_]/g,function(m0){return m0=="-"?"+":"/"}).replace(/[^A-Za-z0-9\+\/]/g,""))};var noConflict=function(){var Base64=global.Base64;global.Base64=_Base64;return Base64};global.Base64={VERSION:version,atob:atob,btoa:btoa,fromBase64:decode,toBase64:encode,utob:utob,encode:encode,encodeURI:encodeURI,btou:btou,decode:decode,noConflict:noConflict,__buffer__:buffer};if(typeof Object.defineProperty==="function"){var noEnum=function(v){return{value:v,enumerable:false,writable:true,configurable:true}};global.Base64.extendString=function(){Object.defineProperty(String.prototype,"fromBase64",noEnum(function(){return decode(this)}));Object.defineProperty(String.prototype,"toBase64",noEnum(function(urisafe){return encode(this,urisafe)}));Object.defineProperty(String.prototype,"toBase64URI",noEnum(function(){return encode(this,true)}))}}if(global["Meteor"]){Base64=global.Base64}if(typeof module!=="undefined"&&module.exports){module.exports.Base64=global.Base64}else if(typeof define==="function"&&define.amd){define([],function(){return global.Base64})}return{Base64:global.Base64}});
+
+////////////////////////base64.min.js //////////////////////////////////
+
+
+const getLinkFromJsonStr = function (dataStr){
+  let data = JSON.parse(dataStr);
   let dbInbound = new DBInbound(data);
   return dbInbound.genLink();
 }
@@ -1732,8 +2019,10 @@ const selfTestAdd = function (a,b){
   return a+b;
 }
 
-
-
+// const jsonStr = {"id":5,"up":619517876,"down":619517876,"total":53687091200,"remark":"speedtest","enable":false,"expiryTime":0,"autoreset":false,"ipalert":false,"iplimit":0,"listen":"","port":59876,"protocol":"vmess","settings":"{\n  \"clients\": [\n    {\n      \"id\": \"14d6853c-813c-49ff-8d09-7edbe832af44\",\n      \"alterId\": 0\n    }\n  ],\n  \"disableInsecureEncryption\": false\n}","streamSettings":"{\n  \"network\": \"ws\",\n  \"security\": \"tls\",\n  \"tlsSettings\": {\n    \"serverName\": \"cloud2.131433.xyz\",\n    \"certificates\": [\n      {\n        \"certificateFile\": \"/nginxweb/cert/fullchain.cer\",\n        \"keyFile\": \"/nginxweb/cert/private.key\"\n      }\n    ]\n  },\n  \"wsSettings\": {\n    \"path\": \"/fire\",\n    \"headers\": {}\n  }\n}","tag":"inbound-59876","sniffing":"{\n  \"enabled\": true,\n  \"destOverride\": [\n    \"http\",\n    \"tls\"\n  ]\n}"}
+// a = JSON.stringify(jsonStr)
+// let linkFromJsonStr = getLinkFromJsonStr(a);
+// console.log(linkFromJsonStr)
 
 
 

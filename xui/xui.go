@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 	"sync-xui-sub/config"
+	"sync-xui-sub/js"
 	"time"
 )
 
@@ -214,8 +215,31 @@ func GetBaseUrlFromUrl(urlStr string) string {
 //	@param obj
 //	@return string
 func GenVmessLinkFromObj(obj Obj) string {
-
-	return ""
+	node := js.ServerNode{
+		ID:             obj.ID,
+		Up:             obj.Up,
+		Down:           obj.Down,
+		Total:          obj.Total,
+		Remark:         obj.Remark,
+		Enable:         obj.Enable,
+		ExpiryTime:     obj.ExpiryTime,
+		Autoreset:      obj.Autoreset,
+		Ipalert:        obj.Ipalert,
+		Iplimit:        obj.Iplimit,
+		Listen:         obj.Listen,
+		Port:           obj.Port,
+		Protocol:       obj.Protocol,
+		Settings:       obj.Settings,
+		StreamSettings: obj.StreamSettings,
+		Tag:            obj.Tag,
+		Sniffing:       obj.Sniffing,
+	}
+	link, err := node.GenLink()
+	if err != nil {
+		fmt.Println("node get share link error: ", err)
+		return link
+	}
+	return link
 }
 
 // GenVmessLinkFromObjs
