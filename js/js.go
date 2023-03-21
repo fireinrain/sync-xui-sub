@@ -31,21 +31,23 @@ type ServerNode struct {
 //在golang中执行js
 
 var V8Context *v8.Context
+var CoreJS string
 
 func init() {
 	V8Context = v8.NewContext() // new context with a default VM
+	file, err := os.ReadFile("js/core.js")
+	if err != nil {
+		fmt.Println("read core.js error:", err)
+	} else {
+		CoreJS = string(file)
+	}
 }
 
 func (receiver ServerNode) GenLink() (string, error) {
 	standard := FormatJsonStrForStandard(receiver)
 
 	ctx := v8.NewContext()
-	file, err := os.ReadFile("core.js")
-	if err != nil {
-		fmt.Println("read core.js error:", err)
-		return "", err
-	}
-	coreJs := string(file)
+	coreJs := CoreJS
 	ctx.RunScript(coreJs, "corelink.js")
 	sprintf := fmt.Sprintf("const jsonStr = %s", standard)
 	ctx.RunScript(sprintf, "variable.js")

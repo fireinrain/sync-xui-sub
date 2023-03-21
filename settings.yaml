@@ -11,9 +11,12 @@ servers:
   # ignore node if node remark contains v2rayN
   ignoreNodeFlag: v2rayN
   nodes:
-    # replace with your own loginUrl username and password
+    # replace with your own x-ui loginUrl username and password
     - loginUrl1,username1,password1
     - loginUrl2,username2,password2
     - loginUrl3,username3,password3
-nodeProtocol: vmess
+nodeProtocol:
+   - vmess
+   - vless
+   - trojan
 

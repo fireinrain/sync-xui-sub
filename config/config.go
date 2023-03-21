@@ -22,7 +22,7 @@ type Settings struct {
 		Nodes          []string `yaml:"nodes"`
 		NodeDetail     []Node   `yaml:"nodeDetail"`
 	} `yaml:"servers"`
-	NodeProtocol string `yaml:"nodeProtocol"`
+	NodeProtocol []string `yaml:"nodeProtocol"`
 }
 type Node struct {
 	LoginUrl string `yaml:"loginUrl"`
@@ -47,7 +47,7 @@ func newConfig() *Settings {
 			Nodes          []string `yaml:"nodes"`
 			NodeDetail     []Node   `yaml:"nodeDetail"`
 		}{},
-		NodeProtocol: "",
+		NodeProtocol: []string{""},
 	}
 	// pattern is xxxx,xxx,xxx|xxx,xxx,xxx
 	nodes := os.Getenv("XUI_NODES")
@@ -98,11 +98,14 @@ func newConfig() *Settings {
 		s.Servers.NodeDetail = results
 	}
 
+	//vmess,vless,trojan,ss
 	protocol := os.Getenv("XUI_PROTOCOL")
 	if protocol != "" {
-		s.NodeProtocol = protocol
+		split := strings.Split(protocol, ",")
+		s.NodeProtocol = split
 	} else {
-		s.NodeProtocol = "vmess"
+		var protocols = []string{"vmess"}
+		s.NodeProtocol = protocols
 	}
 
 	mode := os.Getenv("SubRestartMode")

@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	// Define the form data
 	globalConfig := config.GlobalConfig
 
@@ -15,22 +14,11 @@ func main() {
 	globalConfig = config
 
 	list := xui.GetAllServerNodeList(globalConfig)
-
-	fmt.Println(list)
+	//fmt.Println(list)
 	nodes := xui.FilterEnabledNodes(globalConfig.NodeProtocol, globalConfig.Servers.IgnoreNodeFlag, list)
-	fmt.Println(nodes)
-	linksStr := ""
-	switch globalConfig.NodeProtocol {
-	case "vmess":
-		objs := xui.GenVmessLinkFromObjs(nodes)
-		linksStr = objs
-	case "vless":
-		fmt.Println("processing vless nodes")
-	case "trojan":
-		fmt.Println("processing trojan nodes")
-	default:
-		fmt.Println("processing default")
-	}
+	//fmt.Println(nodes)
+	linksStr := xui.GenVmessLinkFromObjs(nodes)
+
 	fmt.Println(linksStr)
 
 	//let obj = {

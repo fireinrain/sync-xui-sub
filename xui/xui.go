@@ -79,15 +79,12 @@ func LoginForCookie(loginUrl string, username, password string) string {
 	// Read and print the response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
+		log.Println("read string from response failed: ", err.Error())
 	}
-	if err != nil {
-		log.Println("parse string to url failed: ", err.Error())
-	}
+	log.Printf("login to %s success: %s\n", loginUrl, string(body))
 	cookies := resp.Cookies()
 	cookie := cookies[0]
 	value := cookie.Value
-	log.Println(string(body))
 	return "session=" + value
 }
 
@@ -147,7 +144,7 @@ func GetServerNodeList(baseUrl string, cookie string) (*NodeListResp, error) {
 	//	log.Println(err)
 	//	return nil, err
 	//}
-	fmt.Println(string(jsonResp))
+	//fmt.Println(string(jsonResp))
 	return &response, nil
 }
 
@@ -165,7 +162,7 @@ func GetAllServerNodeList(config *config.Settings) []NodeListResp {
 	return result
 }
 
-func FilterEnabledNodes(protocol string, ignoreFlag string, nodes []NodeListResp) []Obj {
+func FilterEnabledNodes(protocols []string, ignoreFlag string, nodes []NodeListResp) []Obj {
 	var result []Obj
 
 	if len(nodes) <= 0 {
@@ -174,8 +171,10 @@ func FilterEnabledNodes(protocol string, ignoreFlag string, nodes []NodeListResp
 	for _, node := range nodes {
 		obj := node.Obj
 		for _, o := range obj {
-			if o.Protocol == protocol {
-				result = append(result, o)
+			for _, protocol := range protocols {
+				if o.Protocol == protocol {
+					result = append(result, o)
+				}
 			}
 		}
 	}
