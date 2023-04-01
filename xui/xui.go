@@ -106,6 +106,69 @@ func LoginAllNodeCookies(config *config.Settings) *config.Settings {
 	return config
 }
 
+// LogoutForSafe
+//
+//	@Description: 退出登入xui
+//	@param loginUrl
+//	@param cookieStr
+func LogoutForSafe(loginUrl string, cookieStr string) {
+	index := strings.LastIndex(loginUrl, "login")
+	var logoutUrl = loginUrl[:index] + "logout"
+	var cookie = strings.Split(cookieStr, "=")[1]
+	jar, err := cookiejar.New(nil)
+	cookiePair := &http.Cookie{Name: "session", Value: cookie}
+	baseUrlFromUrl := GetBaseUrlFromUrl(logoutUrl)
+
+	// Create a new request with a POST method
+	req, err := http.NewRequest("GET", logoutUrl, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	url, _ := req.URL.Parse(baseUrlFromUrl)
+	jar.SetCookies(url, []*http.Cookie{cookiePair})
+
+	// Set the content type for the form data
+	req.Header.Set("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+
+	client := &http.Client{
+		CheckRedirect: nil,
+		Jar:           jar,
+	}
+	// Make the request
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+	}
+	defer resp.Body.Close()
+
+	// Read and print the response
+	_, err = io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("read string from response failed: ", err.Error())
+	}
+	if resp.StatusCode == http.StatusOK {
+		log.Printf("logout for %s success \n", logoutUrl)
+	} else {
+		log.Printf("logout for %s failed \n", logoutUrl)
+	}
+
+}
+
+// LogoutAllNode
+//
+//	@Description: 退出所有xui登入
+//	@param config
+func LogoutAllNode(config *config.Settings) {
+	nodes := config.Servers.Nodes
+	for index, node := range nodes {
+		split := strings.Split(node, ",")
+		loginUrl := strings.TrimSpace(split[0])
+		cookie := config.Servers.NodeDetail[index].Cookie
+		LogoutForSafe(loginUrl, cookie)
+	}
+}
+
 // GetServerNodeList
 //
 //	@Description: 获取节点列表

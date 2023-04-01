@@ -14,6 +14,8 @@ func main() {
 	globalConfig = config
 
 	list := xui.GetAllServerNodeList(globalConfig)
+	//退出登入
+	xui.LogoutAllNode(globalConfig)
 	//fmt.Println(list)
 	nodes := xui.FilterEnabledNodes(globalConfig.NodeProtocol, globalConfig.Servers.IgnoreNodeFlag, list)
 	//fmt.Println(nodes)
