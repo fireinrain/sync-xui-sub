@@ -19,48 +19,48 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      captcha: '',
-      captchaUrl: ''
-    }
-  },
-  methods: {
-    async submitForm() {
-      // validate captcha
-      const response = await fetch('/api/captcha', {
-        method: 'POST',
-        body: JSON.stringify({captcha: this.captcha})
-      });
-      const result = await response.json();
-      if (!result.success) {
-        alert('Invalid captcha');
-        return;
-      }
-
-      // login logic here
-      const response2 = await fetch('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({username: this.username, password: this.password})
-      });
-      const result2 = await response2.json();
-      if (result2.success) {
-        alert('Login successful');
-      } else {
-        alert('Invalid username or password');
-      }
-    },
-    async getCaptcha() {
-      const response = await fetch('/api/captcha');
-      const result = await response.json();
-      this.captchaUrl = result.url;
-    }
-  },
-  mounted() {
-    this.getCaptcha();
-  }
-}
+// export default {
+//   data() {
+//     return {
+//       username: '',
+//       password: '',
+//       captcha: '',
+//       captchaUrl: ''
+//     }
+//   },
+//   methods: {
+//     async submitForm() {
+//       // validate captcha
+//       const response = await fetch('/api/captcha', {
+//         method: 'POST',
+//         body: JSON.stringify({captcha: this.captcha})
+//       });
+//       const result = await response.json();
+//       if (!result.success) {
+//         alert('Invalid captcha');
+//         return;
+//       }
+//
+//       // login logic here
+//       const response2 = await fetch('/api/login', {
+//         method: 'POST',
+//         body: JSON.stringify({username: this.username, password: this.password})
+//       });
+//       const result2 = await response2.json();
+//       if (result2.success) {
+//         alert('Login successful');
+//       } else {
+//         alert('Invalid username or password');
+//       }
+//     },
+//     async getCaptcha() {
+//       const response = await fetch('/api/captcha');
+//       const result = await response.json();
+//       this.captchaUrl = result.url;
+//     }
+//   },
+//   mounted() {
+//     this.getCaptcha();
+//   }
+// }
 </script>
