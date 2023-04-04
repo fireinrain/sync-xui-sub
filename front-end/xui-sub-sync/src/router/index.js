@@ -10,6 +10,16 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/xui-node',
+      name: 'xui-node',
+      component: () => import('../views/XuiNodeView.vue')
+    },
+    {
+      path: '/user-sub',
+      name: 'user-sub',
+      component: () => import('../views/UserSubView.vue')
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue')
