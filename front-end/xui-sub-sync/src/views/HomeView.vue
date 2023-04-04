@@ -1,6 +1,6 @@
 <template>
   <div>
-    欢迎来到XXXX
+    欢迎来到xui-sub-sync
   </div>
 </template>
 

@@ -1,66 +1,75 @@
 <template>
-  <div>
-    <h2>Login</h2>
-    <form @submit.prevent="submitForm">
-      <label for="username">Username:</label>
-      <input type="text" id="username" v-model="username" required>
-
-      <label for="password">Password:</label>
-      <input type="password" id="password" v-model="password" required>
-
-      <div>
-        <img :src="captchaUrl" alt="captcha image">
-        <input type="text" id="captcha" v-model="captcha" required>
-      </div>
-
-      <button type="submit">Login</button>
-    </form>
+  <div class="login-wrapper">
+    <el-form ref="loginForm" :model="loginForm" label-width="80px" class="login-form">
+      <h3 class="login-title">xui-sub-sync</h3>
+      <el-form-item label="Username" prop="username">
+        <el-input v-model="loginForm.username" placeholder="Username"></el-input>
+      </el-form-item>
+      <el-form-item label="Password" prop="password">
+        <el-input v-model="loginForm.password" placeholder="Password" type="password"></el-input>
+      </el-form-item>
+      <el-form-item label="Image Recaptcha" prop="recaptcha">
+        <!-- replace the placeholder with your image recaptcha component -->
+        <div style="height: 100px;">Image Recaptcha Component Placeholder</div>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleSubmit" class="login-button">Login</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script>
-// export default {
-//   data() {
-//     return {
-//       username: '',
-//       password: '',
-//       captcha: '',
-//       captchaUrl: ''
-//     }
-//   },
-//   methods: {
-//     async submitForm() {
-//       // validate captcha
-//       const response = await fetch('/api/captcha', {
-//         method: 'POST',
-//         body: JSON.stringify({captcha: this.captcha})
-//       });
-//       const result = await response.json();
-//       if (!result.success) {
-//         alert('Invalid captcha');
-//         return;
-//       }
-//
-//       // login logic here
-//       const response2 = await fetch('/api/login', {
-//         method: 'POST',
-//         body: JSON.stringify({username: this.username, password: this.password})
-//       });
-//       const result2 = await response2.json();
-//       if (result2.success) {
-//         alert('Login successful');
-//       } else {
-//         alert('Invalid username or password');
-//       }
-//     },
-//     async getCaptcha() {
-//       const response = await fetch('/api/captcha');
-//       const result = await response.json();
-//       this.captchaUrl = result.url;
-//     }
-//   },
-//   mounted() {
-//     this.getCaptcha();
-//   }
-// }
+import { ref } from 'vue';
+import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
+
+export default {
+  name: 'LoginView',
+  components: {
+    ElForm,
+    ElFormItem,
+    ElInput,
+    ElButton,
+  },
+  setup() {
+    const loginForm = ref({
+      username: '',
+      password: '',
+      recaptcha: '',
+    });
+
+    const handleSubmit = () => {
+      // handle form submission here
+    };
+
+    return {
+      loginForm,
+      handleSubmit,
+    };
+  },
+};
 </script>
+
+<style scoped>
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.login-form {
+  width: 400px;
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+/* Set the width of the login button to be the same as the username field */
+.el-form-item__content .el-input__inner,
+.login-button {
+  width: 100%;
+}
+</style>

@@ -22,6 +22,8 @@ const handleSelect = (key, keyPath) => {
     <el-menu-item index="2"><RouterLink to="/xui-node">x-ui节点</RouterLink></el-menu-item>
     <el-menu-item index="3"><RouterLink to="/user-sub">用户订阅</RouterLink></el-menu-item>
     <el-menu-item index="4"><RouterLink to="/login">登录</RouterLink></el-menu-item>
+    <el-menu-item index="5"><RouterLink to="/logout">注销</RouterLink></el-menu-item>
+
   </el-menu>
 
   <RouterView />
