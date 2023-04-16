@@ -20,12 +20,14 @@ import { defineComponent, ref } from 'vue';
 import { ElButton, ElDialog } from 'element-plus';
 
 const useLogoutDialog = () => {
+  const that = this
+
   const dialogVisible = ref(true);
 
   const handleLogout = () => {
     // TODO: send request to logout API
     // after logout, navigate to the home page
-    this.$router.push({ name: 'Home' });
+    that.$router.push({ name: 'home' });
   };
 
   return {
